@@ -41,3 +41,17 @@ PLAYWRIGHT_BROWSER_TYPE = "chromium"
 PLAYWRIGHT_LAUNCH_OPTIONS = {
     "headless": False,
 }
+
+PLAYWRIGHT_MAX_CONTEXTS = 2
+PLAYWRIGHT_MAX_PAGES_PER_CONTEXT = 2
+CONCURRENT_REQUESTS = 4
+DOWNLOAD_DELAY = 0
+
+FEED_EXPORT_FIELDS = [
+    "name",
+    "price",
+    "original_price",
+    "rating",
+    "discount",
+    "details",
+]

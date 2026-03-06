@@ -25,53 +25,32 @@ def format_price(txt: str) -> str:
     """Format price as currency string with comma separators."""
     return f"{clean_price(txt):,.2f}"
 
-def extract_original_price(value) -> str:
-    """Extract original price - handles strings or elements."""
+def clean_rating(value):
+    try:
+        return float(value)
+    except:
+        return 0.0
+
+def extract_original_price(value):
     if not value:
-        return "No Original Price"
-    
-    # If it's a string, return it
+        return 0.0
+    return clean_price(value)
+
+def extract_discount(value):
+    if not value:
+        return "0%"
+
     if isinstance(value, str):
         value = value.strip()
-        return value if value else "No Original Price"
-    
-    # If it's an element object with inner_text method
-    if hasattr(value, 'inner_text'):
-        try:
-            text = value.inner_text()
-            return text.strip() if text else "No Original Price"
-        except:
-            return "No Original Price"
-    
-    return "No Original Price"
+        return value if value else "0%"
 
-def extract_discount(value) -> str:
-    """Extract discount text - handles strings or element objects."""
-    
-    if not value:
-        return "No Discount"
-    
-    # If already a string
-    if isinstance(value, str):
-        value = value.strip()
-        return value if value else "No Discount"
-    
-    # If it's an element (Playwright element handle)
-    if hasattr(value, 'inner_text'):
-        try:
-            text = value.inner_text()
-            return text.strip() if text else "No Discount"
-        except:
-            return "No Discount"
-    
-    return "No Discount"
+    return "0%"
 
 
-def extract_details(values):
-    if not values:
-        return {"details": []}
+def extract_details(values): 
+    if not values: 
+        return {"details": []} 
     return {"details": [v.strip() for v in values if v]}
-
 
 
 class LaptopItem(scrapy.Item):
@@ -85,9 +64,10 @@ class LaptopItem(scrapy.Item):
         output_processor=TakeFirst()
     )
     rating = scrapy.Field(
-        input_processor= MapCompose(float),
-        output_processor=TakeFirst()
+    input_processor=MapCompose(clean_rating),
+    output_processor=TakeFirst()
     )
+    
     original_price = scrapy.Field(
         input_processor= MapCompose(clean_price),
         output_processor=TakeFirst()
@@ -97,6 +77,7 @@ class LaptopItem(scrapy.Item):
     output_processor=TakeFirst()
     )
     details = scrapy.Field(
+    input_processor=MapCompose(str.strip),
     output_processor=extract_details
     )
 
